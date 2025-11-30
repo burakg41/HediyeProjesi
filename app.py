@@ -16,10 +16,75 @@ st.set_page_config(
     layout="centered",
 )
 
+# --------- GLOBAL STİL (DARK, KART GÖRÜNÜMÜ) ----------
+st.markdown(
+    """
+<style>
+    .stApp {
+        background: radial-gradient(circle at top, #111827 0, #020617 45%, #000 100%);
+        color: #e5e7eb;
+    }
+    .block-container {
+        max-width: 880px;
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
+    h1, h2, h3 {
+        font-weight: 700;
+    }
+    .gift-section {
+        background: rgba(15,23,42,0.9);
+        border-radius: 18px;
+        padding: 18px 22px;
+        border: 1px solid rgba(55,65,81,0.9);
+        margin-bottom: 18px;
+        box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+    }
+    .gift-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        font-size: 11px;
+        border-radius: 999px;
+        background: linear-gradient(90deg,#22c55e,#16a34a);
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin-bottom: 4px;
+    }
+    .gift-subtitle {
+        font-size: 0.9rem;
+        color: #9ca3af;
+    }
+    .score-label {
+        font-size: 0.8rem;
+        margin-bottom: 3px;
+        color: #e5e7eb;
+    }
+    .score-track {
+        width: 100%;
+        background: #020617;
+        border-radius: 999px;
+        height: 10px;
+        overflow: hidden;
+        border: 1px solid #111827;
+    }
+    .score-fill {
+        height: 100%;
+        border-radius: inherit;
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    "<span class='gift-badge'>beta</span>",
+    unsafe_allow_html=True,
+)
 st.title("🎁 GiftAI – Akıllı Hediye Asistanı")
-st.write(
-    "Sevgilin, arkadaşın veya herhangi biri için birkaç soruyu cevapla, "
-    "yapay zeka sana en uygun hediyeleri önersin."
+st.markdown(
+    "<p class='gift-subtitle'>Sevgilin, arkadaşın veya başka biri için birkaç soruyu cevapla; GiftAI senin yerine beyin fırtınası yapsın.</p>",
+    unsafe_allow_html=True,
 )
 
 # -----------------------------------------------------
@@ -38,7 +103,7 @@ if not OPENAI_API_KEY:
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 # -----------------------------------------------------
-# ✅ MODELLER BENZER MANTIK (BASİTLEŞTİRİLMİŞ)
+# ✅ MODELLER
 # -----------------------------------------------------
 class Recipient:
     def __init__(
@@ -211,7 +276,7 @@ def build_description(product: dict, req: RecommendRequest) -> str:
             f"Küçük bir jestle ortamı yumuşatmak ve gönül almak için uygun bir tercih. "
             f"{base}"
         )
-    return f"Günlük hayatta kullanılabilir, çoğu kişinin sevebileceği güvenli bir tercih. {base}"
+    return f"Günlük hayatta kullanılabilir, çoğu kişinin seveceği güvenli bir tercih. {base}"
 
 
 def compute_weights(req: RecommendRequest) -> dict:
@@ -327,117 +392,139 @@ def call_openai_scoring(req: RecommendRequest, products: List[dict]) -> dict:
 # -----------------------------------------------------
 # 🧾 FORM – KULLANICI GİRDİLERİ
 # -----------------------------------------------------
-st.subheader("👤 Hediye Alınacak Kişi")
+with st.container():
+    st.markdown("<div class='gift-section'>", unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
+    st.subheader("👤 Hediye Alınacak Kişi")
 
-with col1:
-    gender = st.selectbox("Cinsiyet", ["Bilmiyorum / Söylemek istemiyorum", "Kadın", "Erkek"])
-    age = st.number_input("Yaş", min_value=10, max_value=90, value=25, step=1)
+    col1, col2 = st.columns(2)
 
-with col2:
-    relationship = st.selectbox(
-        "İlişkiniz",
+    with col1:
+        gender = st.selectbox("Cinsiyet", ["Bilmiyorum / Söylemek istemiyorum", "Kadın", "Erkek"])
+        age = st.number_input("Yaş", min_value=10, max_value=90, value=25, step=1)
+
+    with col2:
+        relationship = st.selectbox(
+            "İlişkiniz",
+            [
+                "Sevgili / Eş",
+                "Yakın arkadaş",
+                "Aile (anne/baba)",
+                "Kardeş",
+                "İş arkadaşı",
+                "Diğer",
+            ],
+        )
+
+    purpose = st.selectbox(
+        "Hediye amacı",
         [
-            "Sevgili / Eş",
-            "Yakın arkadaş",
-            "Aile (anne/baba)",
-            "Kardeş",
-            "İş arkadaşı",
-            "Diğer",
+            "Doğum günü",
+            "Romantik jest / yıldönümü",
+            "Yeni başlangıç (yeni iş, taşınma vb.)",
+            "Gönül alma / özür",
+            "Kurumsal / iş odaklı",
+            "Öylesine, içimden geldi",
         ],
     )
 
-purpose = st.selectbox(
-    "Hediye amacı",
-    [
-        "Doğum günü",
-        "Romantik jest / yıldönümü",
-        "Yeni başlangıç (yeni iş, taşınma vb.)",
-        "Gönül alma / özür",
-        "Kurumsal / iş odaklı",
-        "Öylesine, içimden geldi",
-    ],
-)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# -------------------- HOBİLER (SERBEST METİN, ÇOKLU) --------------------
-st.subheader("Bildiğin hobileri / ilgi alanları")
+with st.container():
+    st.markdown("<div class='gift-section'>", unsafe_allow_html=True)
 
-if "hobbies" not in st.session_state:
-    st.session_state["hobbies"] = []
+    # -------------------- HOBİLER (SERBEST METİN, ÇOKLU) --------------------
+    st.subheader("🎨 Hobiler & İlgi Alanları")
 
-hobby_input = st.text_input(
-    "Hobi ekle (örn: resim çizmek, paten, anime izlemek…)",
-    key="hobby_input",
-)
-col_h1, col_h2 = st.columns([1, 3])
-with col_h1:
-    if st.button("Hobi ekle"):
-        if hobby_input.strip():
-            st.session_state["hobbies"].append(hobby_input.strip())
-            st.session_state["hobby_input"] = ""
+    if "hobbies" not in st.session_state:
+        st.session_state["hobbies"] = []
 
-if st.session_state["hobbies"]:
-    st.write("Eklenen hobiler:")
-    for h in st.session_state["hobbies"]:
-        st.write(f"• {h}")
+    hobby_input = st.text_input(
+        "Hobi ekle (örn: resim çizmek, paten, anime izlemek…)",
+        key="hobby_input",
+    )
+    col_h1, col_h2 = st.columns([1, 3])
+    with col_h1:
+        if st.button("Hobi ekle"):
+            if hobby_input.strip():
+                st.session_state["hobbies"].append(hobby_input.strip())
+                st.session_state["hobby_input"] = ""
 
-# -------------------- STİL / TARZ (SERBEST METİN, ÇOKLU) --------------------
-st.subheader("Stil / tarz")
+    if st.session_state["hobbies"]:
+        st.write("Eklenen hobiler:")
+        for h in st.session_state["hobbies"]:
+            st.write(f"• {h}")
 
-if "styles" not in st.session_state:
-    st.session_state["styles"] = []
+    st.markdown("---")
 
-style_input = st.text_input(
-    "Stil ekle (örn: pastel tonlar, sade, retro…)",
-    key="style_input",
-)
-col_s1, col_s2 = st.columns([1, 3])
-with col_s1:
-    if st.button("Stil ekle"):
-        if style_input.strip():
-            st.session_state["styles"].append(style_input.strip())
-            st.session_state["style_input"] = ""
+    # -------------------- STİL / TARZ (SERBEST METİN, ÇOKLU) --------------------
+    st.subheader("✨ Stil / Tarz")
 
-if st.session_state["styles"]:
-    st.write("Eklenen stiller:")
-    for s in st.session_state["styles"]:
-        st.write(f"• {s}")
+    if "styles" not in st.session_state:
+        st.session_state["styles"] = []
 
-st.subheader("💸 Bütçe ve Tercihler")
+    style_input = st.text_input(
+        "Stil ekle (örn: pastel tonlar, sade, retro…)",
+        key="style_input",
+    )
+    col_s1, col_s2 = st.columns([1, 3])
+    with col_s1:
+        if st.button("Stil ekle"):
+            if style_input.strip():
+                st.session_state["styles"].append(style_input.strip())
+                st.session_state["style_input"] = ""
 
-col3, col4 = st.columns(2)
-with col3:
-    budget_min = st.number_input("Minimum bütçe (TL)", min_value=0, max_value=100000, value=500, step=100)
-with col4:
-    budget_max = st.number_input("Maksimum bütçe (TL)", min_value=0, max_value=100000, value=3000, step=100)
+    if st.session_state["styles"]:
+        st.write("Eklenen stiller:")
+        for s in st.session_state["styles"]:
+            st.write(f"• {s}")
 
-risk_level = st.selectbox(
-    "Hediye tarzı seçimin",
-    [
-        "Güvenli (herkesin seveceği)",
-        "Normal (bir tık kişiye özel)",
-        "Cesur (daha iddialı, riskli)",
-    ],
-)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-urgency = st.selectbox(
-    "Ne kadar acil?",
-    [
-        "Esnek, zamanım var",
-        "Birkaç gün içinde lazım",
-        "Bugün / yarın hemen lazım",
-    ],
-)
+with st.container():
+    st.markdown("<div class='gift-section'>", unsafe_allow_html=True)
 
-free_text = st.text_area(
-    "Eklemek istediğin özel notlar (isteğe bağlı)",
-    placeholder="Örn: Daha önce parfüm hoşuna gitmemişti, ortak anılarımıza vurgu olsa iyi olur...",
-)
+    st.subheader("💸 Bütçe ve Tercihler")
 
-top_n = st.slider("Kaç farklı hediye fikri görmek istersin?", min_value=1, max_value=5, value=3)
+    col3, col4 = st.columns(2)
+    with col3:
+        budget_min = st.number_input(
+            "Minimum bütçe (TL)", min_value=0, max_value=100000, value=500, step=100
+        )
+    with col4:
+        budget_max = st.number_input(
+            "Maksimum bütçe (TL)", min_value=0, max_value=100000, value=3000, step=100
+        )
 
-# Bu seçimleri backend modeline map edelim
+    risk_level = st.selectbox(
+        "Hediye tarzı seçimin",
+        [
+            "Güvenli (herkesin seveceği)",
+            "Normal (bir tık kişiye özel)",
+            "Cesur (daha iddialı, riskli)",
+        ],
+    )
+
+    urgency = st.selectbox(
+        "Ne kadar acil?",
+        [
+            "Esnek, zamanım var",
+            "Birkaç gün içinde lazım",
+            "Bugün / yarın hemen lazım",
+        ],
+    )
+
+    free_text = st.text_area(
+        "Eklemek istediğin özel notlar (isteğe bağlı)",
+        placeholder="Örn: Daha önce parfüm hoşuna gitmemişti, ortak anılarımıza vurgu olsa iyi olur...",
+    )
+
+    top_n = st.slider("Kaç farklı hediye fikri görmek istersin?", min_value=1, max_value=5, value=3)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+# --------------------- MAP FONKSİYONLARI ---------------------
 def map_relationship(val: str) -> str:
     if val.startswith("Sevgili"):
         return "partner"
@@ -482,13 +569,27 @@ def map_urgency(val: str) -> str:
     return "flexible"
 
 
+# --------------------- SKOR BAR RENDERER ---------------------
+def render_score_bar(label: str, value: float, color: str):
+    pct = max(0, min(int(value * 100), 100))
+    st.markdown(
+        f"""
+        <div class="score-label">{label}: <b>{value:.2f}</b></div>
+        <div class="score-track">
+            <div class="score-fill" style="width:{pct}%;background:{color};"></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 # -----------------------------------------------------
 # 🚀 ÖNERİ BUTONU
 # -----------------------------------------------------
 if st.button("🎁 Hediye Önerilerini Getir"):
     with st.spinner("Hediye fikirleri hazırlanıyor..."):
-        hobbies = st.session_state["hobbies"]
-        style_tags = st.session_state["styles"]
+        hobbies = st.session_state.get("hobbies", [])
+        style_tags = st.session_state.get("styles", [])
 
         recipient = Recipient(
             age=int(age) if age else None,
@@ -554,15 +655,19 @@ if st.button("🎁 Hediye Önerilerini Getir"):
         results_sorted = sorted(results, key=lambda x: x["final_score"], reverse=True)[: req.top_n]
 
     st.subheader("🎯 Senin için seçilen hediye fikirleri")
+
     for r in results_sorted:
+        st.markdown("<div class='gift-section'>", unsafe_allow_html=True)
         st.markdown(f"### 🎁 {r['name']}")
         st.markdown(f"**Tahmini Fiyat:** {int(r['price'])} TL")
         st.write(r["description"])
+
         with st.expander("Detaylı skorlar"):
-            st.write(
-                f"- İlgi uyumu skoru: **{r['scores']['interest_score']:.2f}**\n"
-                f"- Duygusal etki skoru: **{r['scores']['emotion_score']:.2f}**\n"
-                f"- Bütçe uyumu skoru: **{r['scores']['budget_score']:.2f}**\n"
-                f"- Genel skor: **{r['final_score']:.2f}**"
-            )
-        st.markdown("---")
+            render_score_bar("İlgi uyumu", r["scores"]["interest_score"], "linear-gradient(90deg,#22c55e,#4ade80)")
+            render_score_bar("Duygusal etki", r["scores"]["emotion_score"], "linear-gradient(90deg,#ec4899,#f97316)")
+            render_score_bar("Bütçe uyumu", r["scores"]["budget_score"], "linear-gradient(90deg,#38bdf8,#6366f1)")
+            render_score_bar("Genel skor", r["final_score"], "linear-gradient(90deg,#a855f7,#22c55e)")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("")
+
