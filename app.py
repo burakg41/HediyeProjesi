@@ -441,14 +441,13 @@ with st.container():
 
     hobby_input = st.text_input(
         "Hobi ekle (örn: resim çizmek, paten, anime izlemek…)",
-        key="hobby_input",
+        value="",
     )
     col_h1, col_h2 = st.columns([1, 3])
     with col_h1:
         if st.button("Hobi ekle"):
             if hobby_input.strip():
                 st.session_state["hobbies"].append(hobby_input.strip())
-                st.session_state["hobby_input"] = ""
 
     if st.session_state["hobbies"]:
         st.write("Eklenen hobiler:")
@@ -465,14 +464,13 @@ with st.container():
 
     style_input = st.text_input(
         "Stil ekle (örn: pastel tonlar, sade, retro…)",
-        key="style_input",
+        value="",
     )
     col_s1, col_s2 = st.columns([1, 3])
     with col_s1:
         if st.button("Stil ekle"):
             if style_input.strip():
                 st.session_state["styles"].append(style_input.strip())
-                st.session_state["style_input"] = ""
 
     if st.session_state["styles"]:
         st.write("Eklenen stiller:")
@@ -670,4 +668,3 @@ if st.button("🎁 Hediye Önerilerini Getir"):
 
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("")
-
