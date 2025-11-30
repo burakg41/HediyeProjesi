@@ -360,33 +360,49 @@ purpose = st.selectbox(
     ],
 )
 
-hobbies = st.multiselect(
-    "Bildiğin hobileri / ilgi alanları",
-    [
-        "Spor",
-        "Yoga / Pilates",
-        "Müzik",
-        "Kitap",
-        "Teknoloji",
-        "Kahve / Çay",
-        "Fotoğrafçılık",
-        "Gezi / Seyahat",
-        "Oyun / Geek kültürü",
-        "Ev dekorasyonu",
-    ],
-)
+# -------------------- HOBİLER (SERBEST METİN, ÇOKLU) --------------------
+st.subheader("Bildiğin hobileri / ilgi alanları")
 
-style_tags = st.multiselect(
-    "Stil / tarz",
-    [
-        "Minimalist",
-        "Renkli",
-        "Şık / Klasik",
-        "Cool / Trendy",
-        "Sevimli / Cute",
-        "Retro / Vintage",
-    ],
+if "hobbies" not in st.session_state:
+    st.session_state["hobbies"] = []
+
+hobby_input = st.text_input(
+    "Hobi ekle (örn: resim çizmek, paten, anime izlemek…)",
+    key="hobby_input",
 )
+col_h1, col_h2 = st.columns([1, 3])
+with col_h1:
+    if st.button("Hobi ekle"):
+        if hobby_input.strip():
+            st.session_state["hobbies"].append(hobby_input.strip())
+            st.session_state["hobby_input"] = ""
+
+if st.session_state["hobbies"]:
+    st.write("Eklenen hobiler:")
+    for h in st.session_state["hobbies"]:
+        st.write(f"• {h}")
+
+# -------------------- STİL / TARZ (SERBEST METİN, ÇOKLU) --------------------
+st.subheader("Stil / tarz")
+
+if "styles" not in st.session_state:
+    st.session_state["styles"] = []
+
+style_input = st.text_input(
+    "Stil ekle (örn: pastel tonlar, sade, retro…)",
+    key="style_input",
+)
+col_s1, col_s2 = st.columns([1, 3])
+with col_s1:
+    if st.button("Stil ekle"):
+        if style_input.strip():
+            st.session_state["styles"].append(style_input.strip())
+            st.session_state["style_input"] = ""
+
+if st.session_state["styles"]:
+    st.write("Eklenen stiller:")
+    for s in st.session_state["styles"]:
+        st.write(f"• {s}")
 
 st.subheader("💸 Bütçe ve Tercihler")
 
@@ -471,6 +487,9 @@ def map_urgency(val: str) -> str:
 # -----------------------------------------------------
 if st.button("🎁 Hediye Önerilerini Getir"):
     with st.spinner("Hediye fikirleri hazırlanıyor..."):
+        hobbies = st.session_state["hobbies"]
+        style_tags = st.session_state["styles"]
+
         recipient = Recipient(
             age=int(age) if age else None,
             gender=gender.lower(),
