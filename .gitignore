@@ -1,0 +1,50 @@
+# ---- Python genel ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# ---- Sanal ortamlar ----
+.venv/
+venv/
+env/
+ENV/
+.venv*/
+venv*/
+env*/
+
+# ---- IDE / Editor dosyaları ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- Sistem dosyaları ----
+.DS_Store
+Thumbs.db
+
+# ---- Çıktı / build ----
+dist/
+build/
+*.spec
+
+# ---- Gizli config dosyaları ----
+.env
+.env.*
+*.secret
+*.key
+
+# ---- Test cache ----
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# ---- Uvicorn / gunicorn logları (opsiyonel) ----
+uvicorn.log
+gunicorn.log
